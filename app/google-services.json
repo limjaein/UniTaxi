@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "522255741115",
+    "firebase_url": "https://unitaxi-42d3a.firebaseio.com",
+    "project_id": "unitaxi-42d3a",
+    "storage_bucket": "unitaxi-42d3a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522255741115:android:57410c80c407a3dd",
+        "android_client_info": {
+          "package_name": "com.example.jaein.unitaxi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "522255741115-m5ijkhnu3ofsd915c1998j5of54u8bu9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jaein.unitaxi",
+            "certificate_hash": "5136756769aa4038f2d38e41315bcf941b4578ba"
+          }
+        },
+        {
+          "client_id": "522255741115-unp22pqs5skmjg2ciqn0etmd5vsmlis0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXGejN5V3EyzRYjV5j0Yengl5PyHHjr6M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "522255741115-unp22pqs5skmjg2ciqn0etmd5vsmlis0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
