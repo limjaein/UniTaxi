@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,7 +14,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import static com.example.jaein.unitaxi.R.id.uni;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     EditText query;
@@ -33,7 +35,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         init();
+        Toast.makeText(this, initTime(), Toast.LENGTH_SHORT).show();
         initDB();
+    }
+
+    private String initTime()
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault());
+        Date date = new Date();
+        String strDate = dateFormat.format(date);
+
+        return strDate;
     }
 
     private void initDB() {
@@ -79,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void joinBtnClick(View view) {
         id = (EditText)findViewById(R.id.id);
-        univer = (EditText)findViewById(uni);
+        univer = (EditText)findViewById(R.id.uni);
         gender = (EditText)findViewById(R.id.gender);
         String st1 = id.getText().toString();
         String st2 = univer.getText().toString();
