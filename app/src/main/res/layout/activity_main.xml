@@ -8,11 +8,48 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context="com.example.jaein.unitaxi.MainActivity">
-    <Button
+    <EditText
+        android:id="@+id/query"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="btnClick"
-        android:text="DB테스트"
-        android:id="@+id/button2" />
+        android:text="kangjnhan"/>
+    <Button
+        android:text="Query"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="loginBtnClick"/>
+    <EditText
+        android:id="@+id/id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="limjaein"/>
+    <EditText
+        android:id="@+id/uni"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="건국대학교"/>
+    <EditText
+        android:id="@+id/gender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="w"/>
+    <Button
+        android:text="join"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="joinBtnClick"/>
+    <TextView
+        android:id="@+id/queryResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/query_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/query_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>
