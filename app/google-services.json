@@ -15,14 +15,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "522255741115-d0gibk640vtr40map39pg18us69koo0t.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.jaein.unitaxi",
-            "certificate_hash": "f0333035191b6ced6dadc71ab3996d77453507b1"
-          }
-        },
-        {
           "client_id": "522255741115-m5ijkhnu3ofsd915c1998j5of54u8bu9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
