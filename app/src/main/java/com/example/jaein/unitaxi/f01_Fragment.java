@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -44,20 +45,34 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     private Double lat = null;
     private Double lon = null;
 
+    LinearLayout linearLayout;
+
     public f01_Fragment() {
         // Required empty public constructor
     }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View containerView = inflater.inflate(R.layout.fragment_f01, container, false);
+        linearLayout = (LinearLayout) containerView.findViewById(R.id.mapview);
+        return containerView;
+    }
 
+    public interface OnFragmentInteractionListener {
+    }
+
+    /// tmap gps listener
+    @Override
+    public void onLocationChange(Location location) {
+        if (m_bTrackingMode) {
+            tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
+        }
+    }
+
+    public void initMap(){
         //Tmap 각종 객체 선언
         tmapdata = new TMapData(); //POI검색, 경로검색 등의 지도데이터를 관리하는 클래스
-        LinearLayout linearLayout = (LinearLayout) containerView.findViewById(R.id.mapview);
         tmapview = new TMapView(getActivity());
         linearLayout.addView(tmapview);
         tmapview.setSKPMapApiKey(mApiKey);
@@ -73,9 +88,9 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
         /* 줌레벨 */
         tmapview.setZoomLevel(15);
-        /*지도타입 */
+        /* 지도타입 */
         tmapview.setMapType(TMapView.MAPTYPE_STANDARD);
-        /*언어 설정*/
+        /* 언어 설정*/
         tmapview.setLanguage(TMapView.LANGUAGE_KOREAN);
 
         tmapgps = new TMapGpsManager(getActivity());//단말기 위치탐색을 위한 클래
@@ -127,18 +142,13 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             });
 
         }
-
-        return containerView;
     }
-
-    public interface OnFragmentInteractionListener {
-    }
-
-    /// tmap gps listener
     @Override
-    public void onLocationChange(Location location) {
-        if (m_bTrackingMode) {
-            tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
-        }
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+       initMap();
+
     }
+
 }

@@ -7,6 +7,8 @@ package com.example.jaein.unitaxi;
 public class manager {
     private String ad_date;
     private String ad_time;
+    private String ad_master;
+    private String ad_people;
     private boolean ad_goback;
     private double ad_lat;
     private double ad_lon;
@@ -23,10 +25,12 @@ public class manager {
         this.ad_wholeNum = 0;
     }
 
-    manager(String date, String time, boolean goback, double lat, double lon, int partnum, int wholenum){
+    manager(String date, String time, String master, String people, boolean goback, double lat, double lon, int partnum, int wholenum){
         this.ad_date = date;
         this.ad_time = time;
+        this.ad_master = master;
         this.ad_goback = goback;
+        this.ad_people = people;
         this.ad_lat = lat;
         this.ad_lon = lon;
         this.ad_partNum = partnum;
@@ -45,6 +49,8 @@ public class manager {
     public String getAd_time(){
         return this.ad_time;
     }
+    public String getAd_master(){ return this.ad_master;}
+    public String getAd_people(){ return this.ad_people;}
     public boolean getAd_goback(){
         return this.ad_goback;
     }
