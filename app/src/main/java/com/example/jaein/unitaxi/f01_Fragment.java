@@ -73,7 +73,9 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     public void initMap(){
         //Tmap 각종 객체 선언
         tmapdata = new TMapData(); //POI검색, 경로검색 등의 지도데이터를 관리하는 클래스
-        tmapview = new TMapView(getActivity());
+        if (getActivity() != null) {
+            tmapview = new TMapView(getActivity()); // 이 부분 자꾸 오류난다-재인
+        }
         linearLayout.addView(tmapview);
         tmapview.setSKPMapApiKey(mApiKey);
 
@@ -147,7 +149,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-       initMap();
+        initMap();
 
     }
 

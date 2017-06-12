@@ -22,7 +22,7 @@ public class u02_Login_Activity extends AppCompatActivity {
     static DatabaseReference dbTable;
     static DatabaseReference db_uni, db_member, db_manager; // 전부다 저장해두기
     EditText id,pass;
-    String inputPw;
+    static String loginUni, loginName, loginId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +44,10 @@ public class u02_Login_Activity extends AppCompatActivity {
 
     private String initTime()
     {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault());
-        Date date = new Date();
-        String strDate = dateFormat.format(date);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        Date now = new Date();
+
+        String strDate = formatter.format(now);
 
         return strDate;
     }
@@ -74,6 +75,9 @@ public class u02_Login_Activity extends AppCompatActivity {
                     member m = data.getValue(member.class);
                     if(str_pwd.equals(m.getMember_passwd())){
                         Intent loginIntent = new Intent(u02_Login_Activity.this, u04_Main_Activity.class);
+                        loginUni = m.getMember_uni();
+                        loginName = m.getMember_name();
+                        loginId = m.getMember_id();
                         startActivity(loginIntent);
                     }
                     else{
