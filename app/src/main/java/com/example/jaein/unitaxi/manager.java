@@ -63,6 +63,10 @@ public class manager {
     public void setAd_date(String ad_date){
         this.ad_date = ad_date;
     }
+
+    public void setAd_people(String ad_people){
+        this.ad_people = ad_people;
+    }
     public void setAd_partNum(int ad_partNum){
         this.ad_partNum = ad_partNum;
     }
