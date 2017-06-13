@@ -11,7 +11,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.skp.Tmap.TMapData;
@@ -45,7 +45,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     private Double lat = null;
     private Double lon = null;
 
-    LinearLayout linearLayout;
+    FrameLayout framelayout;
 
     public f01_Fragment() {
         // Required empty public constructor
@@ -55,7 +55,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View containerView = inflater.inflate(R.layout.fragment_f01, container, false);
-        linearLayout = (LinearLayout) containerView.findViewById(R.id.mapview);
+        framelayout = (FrameLayout) containerView.findViewById(R.id.mapview);
         return containerView;
     }
 
@@ -76,7 +76,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         if (getActivity() != null) {
             tmapview = new TMapView(getActivity()); // 이 부분 자꾸 오류난다-재인
         }
-        linearLayout.addView(tmapview);
+        framelayout.addView(tmapview);
         tmapview.setSKPMapApiKey(mApiKey);
 
         //addPoint();
