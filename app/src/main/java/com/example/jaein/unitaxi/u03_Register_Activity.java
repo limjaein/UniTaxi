@@ -3,7 +3,11 @@ package com.example.jaein.unitaxi;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -13,8 +17,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import static com.example.jaein.unitaxi.u02_Login_Activity.db_member;
 
-public class u03_Register_Activity extends AppCompatActivity {
-
+public class u03_Register_Activity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+    TextView selectedText;
+    Spinner spinner;
+    String[] item;
     EditText id,name,passwd;
 
     @Override
@@ -23,6 +29,16 @@ public class u03_Register_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_u03_register);
 
         init();
+        selectedText = (TextView)findViewById(R.id.selectedText);
+        spinner = (Spinner)findViewById(R.id.spinner);
+
+        spinner.setOnItemSelectedListener(this);
+
+        item = new String[]{"대학교 선택","건국대학교","동국대학교","서울시립대학교","이화여자대학교","한양대학교","홍익대학교"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
     }
 
     private void init() {
@@ -120,5 +136,18 @@ public class u03_Register_Activity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int i, long id) {
+        selectedText.setText(item[i]);
+        if(selectedText.getText().toString().equals("대학교 선택")) {
+            selectedText.setText("");
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        selectedText.setText("");
     }
 }

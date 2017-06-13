@@ -64,14 +64,16 @@
         android:orientation="horizontal"
         android:gravity="center">
 
-        <EditText
+        <TextView
+            android:id="@+id/selectedText"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="대학교 선택"
+            android:hint=" 대학교 선택"
             android:textSize="15dp"/>
-        <SearchView
+        <Spinner
+            android:id="@+id/spinner"
             android:layout_width="50dp"
-            android:layout_height="40dp"></SearchView>
+            android:layout_height="40dp"></Spinner>
     </LinearLayout>
 
     <LinearLayout
