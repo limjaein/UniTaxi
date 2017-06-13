@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 
 public class u04_Main_Activity extends AppCompatActivity
         implements f01_Fragment.OnFragmentInteractionListener,
@@ -43,6 +45,12 @@ public class u04_Main_Activity extends AppCompatActivity
 
     }
 
+    public void findBtnClick(View view) {
+
+        Button btn = (Button)findViewById(R.id.taxiBtn);
+        btn.setVisibility(View.VISIBLE);
+    }
+
     private class MyPagerAdapter extends FragmentPagerAdapter {
 
         private Fragment[] arrFragments;
@@ -56,7 +64,6 @@ public class u04_Main_Activity extends AppCompatActivity
         public Fragment getItem(int position) {
             return arrFragments[position];
         }
-
         @Override
         public int getCount() {
             return arrFragments.length;

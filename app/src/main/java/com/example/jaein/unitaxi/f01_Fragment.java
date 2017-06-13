@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -152,5 +153,9 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         initMap();
 
     }
+
+    public void findBtnClick(View view) {
+    }
+
 
 }
