@@ -16,11 +16,11 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_marginBottom="0.5dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:gravity="center">
             <EditText
                 android:id="@+id/et_Faddr"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:hint="출발지"
@@ -52,12 +52,14 @@
             android:layout_marginBottom="0.5dp"
             android:orientation="horizontal">
             <Button
+                android:id="@+id/datepicker"
                 android:layout_width="0dp"
                 android:layout_weight="3.5"
                 android:layout_height="match_parent"
                 android:background="@android:color/white"
                 android:text="날짜" />
             <Button
+                android:id="@+id/timepicker"
                 android:layout_width="0dp"
                 android:layout_weight="3.5"
                 android:layout_height="match_parent"
@@ -84,11 +86,85 @@
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/mapview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7.5"
         android:background="@android:color/white">
+        <FrameLayout
+            android:id="@+id/mapview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:text="현재위치: 서울시 광진구 광나루로 26길 38-7"
+            android:textSize="10dp"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
+            android:background="@color/colorPosition"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:layout_gravity="left|bottom"
+            android:orientation="vertical"
+            android:background="@color/colorPosition">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="소요 시간 : "
+                    android:textColor="@color/colorWhite"
+                    android:background="@android:color/transparent"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" 1시간 20분"
+                    android:textColor="@color/colorWhite"
+                    android:background="@android:color/transparent"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="예상 택시비 : "
+                    android:textColor="@color/colorWhite"
+                    android:background="@android:color/transparent"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="7,000 원"
+                    android:textColor="@color/colorWhite"
+                    android:background="@android:color/transparent"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="최소 택시비 : "
+                    android:textColor="@color/colorWhite"
+                    android:background="@android:color/transparent"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1,800 원"
+                    android:textColor="@color/colorWhite"
+                    android:background="@android:color/transparent"/>
+            </LinearLayout>
+        </LinearLayout>
         <Button
             android:id="@+id/taxiBtn"
             android:layout_width="80dp"

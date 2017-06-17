@@ -1,13 +1,19 @@
 package com.example.jaein.unitaxi;
 
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.icu.util.Calendar;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,7 +22,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.skp.Tmap.TMapData;
 import com.skp.Tmap.TMapGpsManager;
@@ -29,7 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,6 +66,8 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     FrameLayout framelayout;
     TMapMarkerItem marker1, marker2;
 
+    private int myYear, myMonth, myDay, myHour, myMinute;
+
     Button searchBtn;
 
     public f01_Fragment() {
@@ -68,6 +79,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         // Inflate the layout for this fragment
         View containerView = inflater.inflate(R.layout.fragment_f01, container, false);
         framelayout = (FrameLayout) containerView.findViewById(R.id.mapview);
+
         return containerView;
     }
 
@@ -222,8 +234,52 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        initMap();
+        final Button datePicker = (Button) getActivity().findViewById(R.id.datepicker);
+        final Button timePicker = (Button) getActivity().findViewById(R.id.timepicker);
 
+        final DatePickerDialog.OnDateSetListener myDateSetListener
+                = new DatePickerDialog.OnDateSetListener() {
+
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                datePicker.setText(String.format("%d년 %d월 %d일", year, monthOfYear + 1, dayOfMonth));
+            }
+        };
+        final TimePickerDialog.OnTimeSetListener myTimeSetListener
+                = new TimePickerDialog.OnTimeSetListener() {
+
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                timePicker.setText(String.format("%d시 %d분", hourOfDay, minute));
+            }
+        };
+
+        datePicker.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View view) {
+                final Calendar c = Calendar.getInstance();
+                myYear = c.get(Calendar.YEAR);
+                myMonth = c.get(Calendar.MONTH);
+                myDay = c.get(Calendar.DAY_OF_MONTH);
+                Dialog dlgDate = new DatePickerDialog(getActivity(), myDateSetListener,
+                        myYear, myMonth, myDay);
+                dlgDate.show();
+            }
+        });
+
+        timePicker.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View view) {
+                final Calendar c = Calendar.getInstance();
+                myHour = c.get(Calendar.HOUR_OF_DAY);
+                myMinute = c.get(Calendar.MINUTE);
+                Dialog dlgTime = new TimePickerDialog(getActivity(), myTimeSetListener,
+                        myHour, myMinute, false);
+                dlgTime.show();
+            }
+        });
+        initMap();
     }
 
 
