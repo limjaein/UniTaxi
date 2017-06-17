@@ -6,9 +6,9 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.icu.util.Calendar;
 import android.location.Address;
 import android.location.Geocoder;
-import android.icu.util.Calendar;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,17 +16,16 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.skp.Tmap.TMapData;
 import com.skp.Tmap.TMapGpsManager;
@@ -68,7 +67,12 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
     private int myYear, myMonth, myDay, myHour, myMinute;
 
+    TextView fore_time, fore_money, fore_divide_money;
+
     Button searchBtn;
+    LinearLayout info_box;
+
+    int cost,time;
 
     public f01_Fragment() {
         // Required empty public constructor
@@ -144,11 +148,17 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     public void initMap(){
         final Button btn = (Button)getActivity().findViewById(R.id.taxiBtn);
         searchBtn = (Button)getActivity().findViewById(R.id.searchBtn);
+        info_box = (LinearLayout)getActivity().findViewById(R.id.info_box);
+
+
+        fore_time = (TextView)getActivity().findViewById(R.id.fore_time);
+        fore_money = (TextView)getActivity().findViewById(R.id.fore_money);
+        fore_divide_money = (TextView)getActivity().findViewById(R.id.fore_divide_money);
 
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                info_box.setVisibility(View.VISIBLE);
                 btn.setVisibility(View.VISIBLE);
                 getAddress();
 
@@ -170,14 +180,34 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                     tmapdata.findPathData(point1, point2, new TMapData.FindPathDataListenerCallback() {
                         @Override
                     public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                        tmapview.addTMapPath(tMapPolyLine);
-                            Log.i("거리",tMapPolyLine.getDistance()+"");
+                            tmapview.addTMapPath(tMapPolyLine);
                             setZoom(tMapPolyLine.getDistance());
+
+                            cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
+                            time=(int)(tMapPolyLine.getDistance()/1000);
+                            if(cost <= 3000){
+                                cost = 3000;
+                            }
+
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    getActivity().runOnUiThread(new Runnable(){
+                                        @Override
+                                        public void run() {
+                                            fore_time.setText(time+"분");
+                                            fore_money.setText(cost+"원");
+                                            fore_divide_money.setText(cost/4+"원");
+                                        }
+                                    });
+                                }
+                            }).start();
+
                     }
                 });
+
             }
         });
-
         //Tmap 각종 객체 선언
         tmapdata = new TMapData(); //POI검색, 경로검색 등의 지도데이터를 관리하는 클래스
         if (getActivity() != null) {

@@ -104,12 +104,14 @@
             android:textColor="@color/colorWhite"
             android:background="@color/colorPosition"/>
         <LinearLayout
+            android:id="@+id/info_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:padding="10dp"
             android:layout_gravity="left|bottom"
             android:orientation="vertical"
+            android:visibility="invisible"
             android:background="@color/colorPosition">
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -123,6 +125,7 @@
                     android:textColor="@color/colorWhite"
                     android:background="@android:color/transparent"/>
                 <TextView
+                    android:id="@+id/fore_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=" 1시간 20분"
@@ -141,6 +144,7 @@
                     android:textColor="@color/colorWhite"
                     android:background="@android:color/transparent"/>
                 <TextView
+                    android:id="@+id/fore_money"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="7,000 원"
@@ -158,6 +162,7 @@
                     android:textColor="@color/colorWhite"
                     android:background="@android:color/transparent"/>
                 <TextView
+                    android:id="@+id/fore_divide_money"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1,800 원"
