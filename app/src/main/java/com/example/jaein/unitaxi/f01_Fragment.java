@@ -3,24 +3,32 @@ package com.example.jaein.unitaxi;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.skp.Tmap.TMapData;
 import com.skp.Tmap.TMapGpsManager;
 import com.skp.Tmap.TMapMarkerItem;
 import com.skp.Tmap.TMapPoint;
+import com.skp.Tmap.TMapPolyLine;
 import com.skp.Tmap.TMapView;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -42,10 +50,14 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     private ArrayList<MapPoint> m_mapPoint = new ArrayList<MapPoint>();
 
     private String address;
-    private Double lat = null;
-    private Double lon = null;
+    double lat1, lat2;
+    double lon1, lon2;
 
+    EditText et_addr1, et_addr2;
     FrameLayout framelayout;
+    TMapMarkerItem marker1, marker2;
+
+    Button searchBtn;
 
     public f01_Fragment() {
         // Required empty public constructor
@@ -60,6 +72,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     }
 
     public interface OnFragmentInteractionListener {
+
     }
 
     /// tmap gps listener
@@ -70,7 +83,89 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         }
     }
 
+    public void getAddress(){
+        et_addr1 = (EditText)getActivity().findViewById(R.id.et_Faddr);
+        et_addr2 = (EditText)getActivity().findViewById(R.id.et_Laddr);
+
+        Geocoder gc = new Geocoder(getActivity(), Locale.KOREA);
+        String addr1 = et_addr1.getText().toString();
+        String addr2 = et_addr2.getText().toString();
+
+
+        try {
+            List<Address> addrList1 = gc.getFromLocationName(addr1, 5);
+            List<Address> addrList2 = gc.getFromLocationName(addr2, 5);
+            if(addrList1!=null && addrList2!=null){
+                lat1 = addrList1.get(0).getLatitude();
+                lon1 = addrList1.get(0).getLongitude();
+
+                lat2 = addrList2.get(0).getLatitude();
+                lon2 = addrList2.get(0).getLongitude();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setZoom(double dist){
+//        두사이 거리
+//        0~5km: zoom 13
+//        5km~9km: zoom 12
+//        9km~29km: zoom 11
+//        29km~47km: zoom 10
+//        48km~: zoom 9
+        dist = dist/1000;
+        if(dist>0&&dist<5){
+            tmapview.setZoom(13);
+        }
+        else if(dist>5&&dist<9){
+            tmapview.setZoom(12);
+        }
+        else if(dist>9&&dist<29){
+            tmapview.setZoom(12.5f);
+        }
+        else if(dist>48){
+            tmapview.setZoom(9);
+        }
+
+    }
     public void initMap(){
+        final Button btn = (Button)getActivity().findViewById(R.id.taxiBtn);
+        searchBtn = (Button)getActivity().findViewById(R.id.searchBtn);
+
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                btn.setVisibility(View.VISIBLE);
+                getAddress();
+
+                    tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
+                    marker1 = new TMapMarkerItem();
+
+                    TMapPoint point1 = new TMapPoint(lat1,lon1);
+//
+//                    marker1.setTMapPoint(point1);
+//                    tmapview.addMarkerItem("출발지",marker1);
+
+                    marker2 = new TMapMarkerItem();
+
+                    TMapPoint point2 = new TMapPoint(lat2,lon2);
+//
+//                    marker2.setTMapPoint(point2);
+//                    tmapview.addMarkerItem("도착지",marker2);
+
+                    tmapdata.findPathData(point1, point2, new TMapData.FindPathDataListenerCallback() {
+                        @Override
+                    public void onFindPathData(TMapPolyLine tMapPolyLine) {
+                        tmapview.addTMapPath(tMapPolyLine);
+                            Log.i("거리",tMapPolyLine.getDistance()+"");
+                            setZoom(tMapPolyLine.getDistance());
+                    }
+                });
+            }
+        });
+
         //Tmap 각종 객체 선언
         tmapdata = new TMapData(); //POI검색, 경로검색 등의 지도데이터를 관리하는 클래스
         if (getActivity() != null) {
@@ -121,28 +216,6 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             /*  화면중심을 단말의 현재위치로 이동 */
             tmapview.setTrackingMode(true);
             tmapview.setSightVisible(true);
-
-            // 풍선에서 우측 버튼 클릭시 할 행동입니다
-            tmapview.setOnCalloutRightButtonClickListener(new TMapView.OnCalloutRightButtonClickCallback() {
-                @Override
-                public void onCalloutRightButton(TMapMarkerItem markerItem) {
-
-                    lat = markerItem.latitude;
-                    lon = markerItem.longitude;
-
-                    //1. 위도, 경도로 주소 검색하기
-                    tmapdata.convertGpsToAddress(lat, lon, new TMapData.ConvertGPSToAddressListenerCallback() {
-                        @Override
-                        public void onConvertToGPSToAddress(String strAddress) {
-                            address = strAddress;
-                        }
-                    });
-
-                    Toast.makeText(getContext(), "주소 : " + address, Toast.LENGTH_SHORT).show();
-                }
-
-            });
-
         }
     }
     @Override
@@ -152,5 +225,6 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         initMap();
 
     }
+
 
 }

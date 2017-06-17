@@ -43,6 +43,7 @@ public class u04_Main_Activity extends AppCompatActivity
 
     }
 
+
     private class MyPagerAdapter extends FragmentPagerAdapter {
 
         private Fragment[] arrFragments;
@@ -56,7 +57,6 @@ public class u04_Main_Activity extends AppCompatActivity
         public Fragment getItem(int position) {
             return arrFragments[position];
         }
-
         @Override
         public int getCount() {
             return arrFragments.length;
