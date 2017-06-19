@@ -10,6 +10,8 @@ import android.icu.util.Calendar;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -56,12 +58,14 @@ import static java.lang.Math.abs;
 /**
  * A simple {@link Fragment} subclass.
  */
+
+
 public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationChangedCallback {
 
     private Context mContext = null;
     private boolean m_bTrackingMode = true;
 
-    private TMapData tmapdata=null;
+    private TMapData tmapdata = null;
     private TMapGpsManager tmapgps = null;
     private TMapView tmapview = null;
     private static String mApiKey = "8e36c4a4-66cd-3e71-8f93-06d5754f647a"; // 발급받은 appKey
@@ -76,6 +80,12 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     double lon1, lon2;
 
     Button taxiBtn;
+    Button nowBtn;
+
+    Double latitude = 0.0;
+    Double longitude = 0.0;
+
+    LocationManager manager;
 
     EditText et_addr1, et_addr2;
     FrameLayout framelayout;
@@ -88,9 +98,9 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     Button searchBtn;
     LinearLayout info_box;
 
-    int cost,time;
+    int cost, time;
 
-    String total_date,total_time;
+    String total_date, total_time;
 
 
     String myTag;
@@ -123,7 +133,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         }
     }
 
-    public void getAddress(){
+    public void getAddress() {
 
 
         Geocoder gc = new Geocoder(getActivity(), Locale.KOREA);
@@ -134,7 +144,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         try {
             List<Address> addrList1 = gc.getFromLocationName(addr1, 5);
             List<Address> addrList2 = gc.getFromLocationName(addr2, 5);
-            if(addrList1!=null && addrList2!=null){
+            if (addrList1 != null && addrList2 != null) {
                 lat1 = addrList1.get(0).getLatitude();
                 lon1 = addrList1.get(0).getLongitude();
 
@@ -145,8 +155,8 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             e.printStackTrace();
         }
     }
-    static String initTime()
-    {
+
+    static String initTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
         Date now = new Date();
 
@@ -156,31 +166,33 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     }
 
 
-    public void initMap(){
+    public void initMap() {
 
         myTag = getTag();
-        ((u04_Main_Activity)getActivity()).setFragment(myTag);
-        et_addr1 = (EditText)getActivity().findViewById(R.id.et_Faddr);
-        et_addr2 = (EditText)getActivity().findViewById(R.id.et_Laddr);
+        ((u04_Main_Activity) getActivity()).setFragment(myTag);
+        et_addr1 = (EditText) getActivity().findViewById(R.id.et_Faddr);
+        et_addr2 = (EditText) getActivity().findViewById(R.id.et_Laddr);
         et_addr2.setText(loginUni);
 
-        taxiBtn = (Button)getActivity().findViewById(R.id.taxiBtn);
-        searchBtn = (Button)getActivity().findViewById(R.id.searchBtn);
-        info_box = (LinearLayout)getActivity().findViewById(R.id.info_box);
-        gobackBtn = (ToggleButton)getActivity().findViewById(R.id.gobackBtn);
+        taxiBtn = (Button) getActivity().findViewById(R.id.taxiBtn);
+        searchBtn = (Button) getActivity().findViewById(R.id.searchBtn);
+        info_box = (LinearLayout) getActivity().findViewById(R.id.info_box);
+        gobackBtn = (ToggleButton) getActivity().findViewById(R.id.gobackBtn);
+
+        nowBtn = (Button)getActivity().findViewById(R.id.nowBtn);
 
 
-        fore_time = (TextView)getActivity().findViewById(R.id.fore_time);
-        fore_money = (TextView)getActivity().findViewById(R.id.fore_money);
-        fore_divide_money = (TextView)getActivity().findViewById(R.id.fore_divide_money);
+        fore_time = (TextView) getActivity().findViewById(R.id.fore_time);
+        fore_money = (TextView) getActivity().findViewById(R.id.fore_money);
+        fore_divide_money = (TextView) getActivity().findViewById(R.id.fore_divide_money);
 
         gobackBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(b){ // 등교
+                if (b) { // 등교
                     et_addr1.setText(loginUni);
                     et_addr2.setText("");
-                }else{
+                } else {
                     et_addr2.setText(loginUni);
                     et_addr1.setText("");
                 }
@@ -322,7 +334,72 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             tmapview.setTrackingMode(true);
             tmapview.setSightVisible(true);
         }
+        nowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startLocationService();
+            }
+        });
     }
+
+    private void startLocationService()
+    {
+        manager=(LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        long minTime=1000;
+        float minDistance=1;
+
+        if(ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+        {
+            Toast.makeText(getActivity(),"Don't have permissions.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,minTime,minDistance,mLocationListener);
+        manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,minTime,minDistance,mLocationListener);
+    }
+
+    private void stopLocationService()
+    {
+        if(ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+        {
+            Toast.makeText(getActivity(),"Don't have permissions.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        manager.removeUpdates(mLocationListener);
+    }
+
+    private final LocationListener mLocationListener=new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            latitude=location.getLatitude();
+            longitude=location.getLongitude();
+            tmapview.setCenterPoint(longitude, latitude);
+            Toast.makeText(getActivity(), latitude+" "+longitude, Toast.LENGTH_SHORT).show();
+            marker1 = new TMapMarkerItem();
+            marker1.setPosition(Float.parseFloat(latitude+""), Float.parseFloat(longitude+""));
+            tmapview.addMarkerItem("현재위치",marker1);
+            stopLocationService();
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -337,7 +414,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                                   int dayOfMonth) {
                 datePicker.setText(String.format("%d년 %d월 %d일", year, monthOfYear + 1, dayOfMonth));
 
-                total_date = String.format("%d%02d%02d",year,monthOfYear + 1, dayOfMonth);
+                total_date = String.format("%d%02d%02d", year, monthOfYear + 1, dayOfMonth);
                 Toast.makeText(getActivity(), total_date, Toast.LENGTH_SHORT).show();
 
             }
