@@ -75,7 +75,7 @@ public class MyAdminAdapter extends BaseAdapter{
             goback = "하교";
         tv_goback.setText(goback);
         tv_pos.setText(
-                data.get(position).getAd_lat()+"."+data.get(position).getAd_lon()
+                data.get(position).getAd_source()+"."+data.get(position).getAd_dest()
         );
         String date = "";
         date += data.get(position).getAd_date().substring(0,4)+"년 ";
@@ -84,11 +84,9 @@ public class MyAdminAdapter extends BaseAdapter{
 
         tv_date.setText(data.get(position).getAd_date());
         String time = "";
-        time += data.get(position).getAd_time().substring(0,2)+":";
-        time += data.get(position).getAd_time().substring(2,4)+" ~ ";
+        time += data.get(position).getAd_time().substring(0,2)+"시";
+        time += data.get(position).getAd_time().substring(2,4)+"분";
 
-        time += data.get(position).getAd_time().substring(4,6)+":";
-        time += data.get(position).getAd_time().substring(6,8);
         tv_time.setText(time);
         tv_number.setText(data.get(position).getAd_partNum()+"명");
 

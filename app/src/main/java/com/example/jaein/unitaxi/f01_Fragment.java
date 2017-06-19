@@ -26,7 +26,12 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.skp.Tmap.TMapData;
 import com.skp.Tmap.TMapGpsManager;
 import com.skp.Tmap.TMapMarkerItem;
@@ -38,6 +43,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.example.jaein.unitaxi.u02_Login_Activity.db_manager;
+import static com.example.jaein.unitaxi.u02_Login_Activity.loginId;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,6 +69,8 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     double lat1, lat2;
     double lon1, lon2;
 
+    Button taxiBtn;
+
     EditText et_addr1, et_addr2;
     FrameLayout framelayout;
     TMapMarkerItem marker1, marker2;
@@ -74,9 +84,12 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
     int cost,time;
 
+    String total_date,total_time;
+
     public f01_Fragment() {
         // Required empty public constructor
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -146,7 +159,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
     }
     public void initMap(){
-        final Button btn = (Button)getActivity().findViewById(R.id.taxiBtn);
+        taxiBtn = (Button)getActivity().findViewById(R.id.taxiBtn);
         searchBtn = (Button)getActivity().findViewById(R.id.searchBtn);
         info_box = (LinearLayout)getActivity().findViewById(R.id.info_box);
 
@@ -159,7 +172,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             @Override
             public void onClick(View view) {
                 info_box.setVisibility(View.VISIBLE);
-                btn.setVisibility(View.VISIBLE);
+                taxiBtn.setVisibility(View.VISIBLE);
                 getAddress();
 
                     tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
@@ -208,6 +221,26 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
             }
         });
+        taxiBtn.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View view) {
+                                           Query man_query = db_manager.orderByChild("admin_info").equalTo(total_date);
+                                           man_query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                               @Override
+                                               public void onDataChange(DataSnapshot dataSnapshot) {
+                                                   manager man = new manager(total_date, total_time, loginId, "", true, et_addr1.getText().toString(),
+                                                           et_addr2.getText().toString(), 0);
+
+                                                   db_manager.child(total_date).setValue(man);
+                                               }
+
+                                               @Override
+                                               public void onCancelled(DatabaseError databaseError) {
+
+                                               }
+                                           });
+                                       }
+                                   });
         //Tmap 각종 객체 선언
         tmapdata = new TMapData(); //POI검색, 경로검색 등의 지도데이터를 관리하는 클래스
         if (getActivity() != null) {
@@ -273,6 +306,10 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
                 datePicker.setText(String.format("%d년 %d월 %d일", year, monthOfYear + 1, dayOfMonth));
+
+                total_date = String.format("%d%02d%02d",year,monthOfYear + 1, dayOfMonth);
+                Toast.makeText(getActivity(), total_date, Toast.LENGTH_SHORT).show();
+
             }
         };
         final TimePickerDialog.OnTimeSetListener myTimeSetListener
@@ -280,6 +317,9 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 timePicker.setText(String.format("%d시 %d분", hourOfDay, minute));
+
+                total_time = String.format("%02d%02d", hourOfDay, minute);
+                Toast.makeText(getActivity(), total_time, Toast.LENGTH_SHORT).show();
             }
         };
 
