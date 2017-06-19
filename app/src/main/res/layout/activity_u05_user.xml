@@ -217,6 +217,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <Button
+            android:id="@+id/setFinalBtn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="bottom"
@@ -226,6 +227,7 @@
             android:text="인원 모집완료"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold"
+            android:visibility="invisible"
             android:textSize="17dp"
             android:backgroundTint="@color/colorYellow"/>
     </LinearLayout>

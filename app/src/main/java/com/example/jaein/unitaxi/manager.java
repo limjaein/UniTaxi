@@ -13,6 +13,7 @@ public class manager {
     private String ad_source;
     private String ad_dest;
     private int ad_partNum;
+    private boolean ad_check; // 방의 존재 유무
 
     manager(){
     }
@@ -26,6 +27,7 @@ public class manager {
         this.ad_source = source;
         this.ad_dest = dest;
         this.ad_partNum = partnum;
+        this.ad_check = true;
     }
 
     public String getAd_date(){
@@ -42,6 +44,9 @@ public class manager {
     public boolean getAd_goback(){
         return this.ad_goback;
     }
+    public boolean getAd_check(){
+        return this.ad_check;
+    }
     public String getAd_source(){
         return this.ad_source;
     }
@@ -51,7 +56,7 @@ public class manager {
     public void setAd_date(String ad_date){
         this.ad_date = ad_date;
     }
-
+    public void setAd_check(Boolean check){this.ad_check = check;}
     public void setAd_people(String ad_people){
         this.ad_people = ad_people;
     }
