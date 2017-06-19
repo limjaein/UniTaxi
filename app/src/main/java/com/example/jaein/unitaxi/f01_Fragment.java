@@ -40,7 +40,9 @@ import com.skp.Tmap.TMapPolyLine;
 import com.skp.Tmap.TMapView;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -85,6 +87,9 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     int cost,time;
 
     String total_date,total_time;
+
+
+    String myTag;
 
     public f01_Fragment() {
         // Required empty public constructor
@@ -135,6 +140,15 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             e.printStackTrace();
         }
     }
+    private String initTime()
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        Date now = new Date();
+
+        String strDate = formatter.format(now);
+
+        return strDate;
+    }
 
     public void setZoom(double dist){
 //        두사이 거리
@@ -159,6 +173,10 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
     }
     public void initMap(){
+
+        myTag = getTag();
+        ((u04_Main_Activity)getActivity()).setFragment(myTag);
+
         taxiBtn = (Button)getActivity().findViewById(R.id.taxiBtn);
         searchBtn = (Button)getActivity().findViewById(R.id.searchBtn);
         info_box = (LinearLayout)getActivity().findViewById(R.id.info_box);
@@ -231,7 +249,13 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                                                    manager man = new manager(total_date, total_time, loginId, "", true, et_addr1.getText().toString(),
                                                            et_addr2.getText().toString(), 0);
 
-                                                   db_manager.child(total_date).setValue(man);
+                                                   db_manager.child(initTime()).setValue(man);
+                                                   String TabTag  = ((u04_Main_Activity)getActivity()).getFragment();
+
+                                                   f01_Fragment frag = (f01_Fragment)getActivity().getSupportFragmentManager().findFragmentByTag(TabTag);
+
+
+                                                   ((u04_Main_Activity)getActivity()).getViewPager().setCurrentItem(1);
                                                }
 
                                                @Override

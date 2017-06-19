@@ -14,9 +14,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class u02_Login_Activity extends AppCompatActivity {
 
     static DatabaseReference dbTable;
@@ -42,15 +39,6 @@ public class u02_Login_Activity extends AppCompatActivity {
         pass = (EditText)findViewById(R.id.loginPasswd);
     }
 
-    private String initTime()
-    {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        Date now = new Date();
-
-        String strDate = formatter.format(now);
-
-        return strDate;
-    }
 
     public void goto_Register(View view) {
         Intent i_register = new Intent(u02_Login_Activity.this, u03_Register_Activity.class);
