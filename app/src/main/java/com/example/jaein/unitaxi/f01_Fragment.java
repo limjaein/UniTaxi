@@ -1,23 +1,37 @@
 package com.example.jaein.unitaxi;
 
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.icu.util.Calendar;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.skp.Tmap.TMapData;
 import com.skp.Tmap.TMapGpsManager;
 import com.skp.Tmap.TMapMarkerItem;
@@ -30,6 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.jaein.unitaxi.u02_Login_Activity.db_manager;
+import static com.example.jaein.unitaxi.u02_Login_Activity.loginId;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,21 +69,34 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     double lat1, lat2;
     double lon1, lon2;
 
+    Button taxiBtn;
+
     EditText et_addr1, et_addr2;
     FrameLayout framelayout;
     TMapMarkerItem marker1, marker2;
 
+    private int myYear, myMonth, myDay, myHour, myMinute;
+
+    TextView fore_time, fore_money, fore_divide_money;
+
     Button searchBtn;
+    LinearLayout info_box;
+
+    int cost,time;
+
+    String total_date,total_time;
 
     public f01_Fragment() {
         // Required empty public constructor
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View containerView = inflater.inflate(R.layout.fragment_f01, container, false);
         framelayout = (FrameLayout) containerView.findViewById(R.id.mapview);
+
         return containerView;
     }
 
@@ -130,14 +159,20 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
     }
     public void initMap(){
-        final Button btn = (Button)getActivity().findViewById(R.id.taxiBtn);
+        taxiBtn = (Button)getActivity().findViewById(R.id.taxiBtn);
         searchBtn = (Button)getActivity().findViewById(R.id.searchBtn);
+        info_box = (LinearLayout)getActivity().findViewById(R.id.info_box);
+
+
+        fore_time = (TextView)getActivity().findViewById(R.id.fore_time);
+        fore_money = (TextView)getActivity().findViewById(R.id.fore_money);
+        fore_divide_money = (TextView)getActivity().findViewById(R.id.fore_divide_money);
 
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                btn.setVisibility(View.VISIBLE);
+                info_box.setVisibility(View.VISIBLE);
+                taxiBtn.setVisibility(View.VISIBLE);
                 getAddress();
 
                     tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
@@ -158,14 +193,54 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                     tmapdata.findPathData(point1, point2, new TMapData.FindPathDataListenerCallback() {
                         @Override
                     public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                        tmapview.addTMapPath(tMapPolyLine);
-                            Log.i("거리",tMapPolyLine.getDistance()+"");
+                            tmapview.addTMapPath(tMapPolyLine);
                             setZoom(tMapPolyLine.getDistance());
+
+                            cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
+                            time=(int)(tMapPolyLine.getDistance()/1000);
+                            if(cost <= 3000){
+                                cost = 3000;
+                            }
+
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    getActivity().runOnUiThread(new Runnable(){
+                                        @Override
+                                        public void run() {
+                                            fore_time.setText(time+"분");
+                                            fore_money.setText(cost+"원");
+                                            fore_divide_money.setText(cost/4+"원");
+                                        }
+                                    });
+                                }
+                            }).start();
+
                     }
                 });
+
             }
         });
+        taxiBtn.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View view) {
+                                           Query man_query = db_manager.orderByChild("admin_info").equalTo(total_date);
+                                           man_query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                               @Override
+                                               public void onDataChange(DataSnapshot dataSnapshot) {
+                                                   manager man = new manager(total_date, total_time, loginId, "", true, et_addr1.getText().toString(),
+                                                           et_addr2.getText().toString(), 0);
 
+                                                   db_manager.child(total_date).setValue(man);
+                                               }
+
+                                               @Override
+                                               public void onCancelled(DatabaseError databaseError) {
+
+                                               }
+                                           });
+                                       }
+                                   });
         //Tmap 각종 객체 선언
         tmapdata = new TMapData(); //POI검색, 경로검색 등의 지도데이터를 관리하는 클래스
         if (getActivity() != null) {
@@ -222,8 +297,59 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        initMap();
+        final Button datePicker = (Button) getActivity().findViewById(R.id.datepicker);
+        final Button timePicker = (Button) getActivity().findViewById(R.id.timepicker);
 
+        final DatePickerDialog.OnDateSetListener myDateSetListener
+                = new DatePickerDialog.OnDateSetListener() {
+
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                datePicker.setText(String.format("%d년 %d월 %d일", year, monthOfYear + 1, dayOfMonth));
+
+                total_date = String.format("%d%02d%02d",year,monthOfYear + 1, dayOfMonth);
+                Toast.makeText(getActivity(), total_date, Toast.LENGTH_SHORT).show();
+
+            }
+        };
+        final TimePickerDialog.OnTimeSetListener myTimeSetListener
+                = new TimePickerDialog.OnTimeSetListener() {
+
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                timePicker.setText(String.format("%d시 %d분", hourOfDay, minute));
+
+                total_time = String.format("%02d%02d", hourOfDay, minute);
+                Toast.makeText(getActivity(), total_time, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        datePicker.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View view) {
+                final Calendar c = Calendar.getInstance();
+                myYear = c.get(Calendar.YEAR);
+                myMonth = c.get(Calendar.MONTH);
+                myDay = c.get(Calendar.DAY_OF_MONTH);
+                Dialog dlgDate = new DatePickerDialog(getActivity(), myDateSetListener,
+                        myYear, myMonth, myDay);
+                dlgDate.show();
+            }
+        });
+
+        timePicker.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View view) {
+                final Calendar c = Calendar.getInstance();
+                myHour = c.get(Calendar.HOUR_OF_DAY);
+                myMinute = c.get(Calendar.MINUTE);
+                Dialog dlgTime = new TimePickerDialog(getActivity(), myTimeSetListener,
+                        myHour, myMinute, false);
+                dlgTime.show();
+            }
+        });
+        initMap();
     }
 
 

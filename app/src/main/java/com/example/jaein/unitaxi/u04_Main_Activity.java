@@ -23,7 +23,6 @@ public class u04_Main_Activity extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tl_tabs);
         ViewPager viewPager = (ViewPager) findViewById(R.id.vp_pager);
 
-
         Fragment[] arrFragments = new Fragment[4];
         arrFragments[0] = new f01_Fragment();
         arrFragments[1] = new f02_Fragment();
@@ -39,7 +38,7 @@ public class u04_Main_Activity extends AppCompatActivity
         tabLayout.getTabAt(3).setIcon(R.drawable.tab3);
     }
 
-    public void onFragmentInteraction(Uri uri){
+        public void onFragmentInteraction(Uri uri){
 
     }
 

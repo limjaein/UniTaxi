@@ -10,31 +10,22 @@ public class manager {
     private String ad_master;
     private String ad_people;
     private boolean ad_goback;
-    private double ad_lat;
-    private double ad_lon;
+    private String ad_source;
+    private String ad_dest;
     private int ad_partNum;
-    private int ad_wholeNum;
 
     manager(){
-        this.ad_date = "00000000";
-        this.ad_time = "00000000";
-        this.ad_goback = true;
-        this.ad_lat = 0.0;
-        this.ad_lon = 0.0;
-        this.ad_partNum = 0;
-        this.ad_wholeNum = 0;
     }
 
-    manager(String date, String time, String master, String people, boolean goback, double lat, double lon, int partnum, int wholenum){
+    manager(String date, String time, String master, String people, boolean goback, String source, String dest, int partnum){
         this.ad_date = date;
         this.ad_time = time;
         this.ad_master = master;
         this.ad_goback = goback;
         this.ad_people = people;
-        this.ad_lat = lat;
-        this.ad_lon = lon;
+        this.ad_source = source;
+        this.ad_dest = dest;
         this.ad_partNum = partnum;
-        this.ad_wholeNum = wholenum;
     }
 
     public String getAd_date(){
@@ -42,9 +33,6 @@ public class manager {
     }
     public int getAd_partNum(){
         return this.ad_partNum;
-    }
-    public int getAd_wholeNum(){
-        return this.ad_wholeNum;
     }
     public String getAd_time(){
         return this.ad_time;
@@ -54,11 +42,11 @@ public class manager {
     public boolean getAd_goback(){
         return this.ad_goback;
     }
-    public double getAd_lat(){
-        return this.ad_lat;
+    public String getAd_source(){
+        return this.ad_source;
     }
-    public double getAd_lon(){
-        return this.ad_lon;
+    public String getAd_dest(){
+        return this.ad_dest;
     }
     public void setAd_date(String ad_date){
         this.ad_date = ad_date;
@@ -69,8 +57,5 @@ public class manager {
     }
     public void setAd_partNum(int ad_partNum){
         this.ad_partNum = ad_partNum;
-    }
-    public void setAd_wholeNum(int ad_wholeNum){
-        this.ad_wholeNum = ad_wholeNum;
     }
 }
