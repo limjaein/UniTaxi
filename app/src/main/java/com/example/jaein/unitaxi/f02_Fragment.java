@@ -1,13 +1,16 @@
 package com.example.jaein.unitaxi;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -77,6 +80,21 @@ public class f02_Fragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         admin_list = new ArrayList<>();
         listView = (ListView)getActivity().findViewById(R.id.listView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getActivity(), (position + 1) + " : Click", Toast.LENGTH_LONG).show();
+            }
+        });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                           int position, long id) {
+                Toast.makeText(getActivity(), (position + 1) + " : Long Click", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), u05_User_Activity.class);
+                intent.putExtra("position", position + 1);
+                startActivity(intent);
+                return true;
+            }
+        });
         getData();
     }
 }

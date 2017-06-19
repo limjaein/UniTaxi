@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class MyAdminAdapter extends BaseAdapter{
         tv_date = (TextView) convertView.findViewById(R.id.date);
         tv_time = (TextView) convertView.findViewById(R.id.time);
         tv_number = (TextView) convertView.findViewById(R.id.L_number);
-        final ImageButton Btn = (ImageButton)convertView.findViewById(R.id.inBtn);
+        final ImageView Btn = (ImageView)convertView.findViewById(R.id.inBtn);
 
 
         String date = "";

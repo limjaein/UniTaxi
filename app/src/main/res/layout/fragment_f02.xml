@@ -14,7 +14,4 @@
         android:id="@+id/listView">
     </ListView>
 
-    <!-- TODO: Update blank fragment layout -->
-
-
 </LinearLayout>

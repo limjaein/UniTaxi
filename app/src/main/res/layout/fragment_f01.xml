@@ -57,7 +57,8 @@
                 android:layout_weight="3.5"
                 android:layout_height="match_parent"
                 android:background="@android:color/white"
-                android:text="날짜" />
+                android:text="날짜"
+                android:textStyle="bold"/>
             <Button
                 android:id="@+id/timepicker"
                 android:layout_width="0dp"
@@ -65,7 +66,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="0.5dp"
                 android:background="@color/colorWhite"
-                android:text="시간"/>
+                android:text="시간"
+                android:textStyle="bold"/>
             <ToggleButton
                 android:id="@+id/gobackBtn"
                 android:layout_width="0dp"
@@ -74,15 +76,14 @@
                 android:layout_marginLeft="0.5dp"
                 android:background="@android:color/white"
                 android:textOff="등교"
-                android:textOn="하교"/>
+                android:textOn="하교"
+                android:textStyle="bold"/>
             <Button
                 android:id="@+id/searchBtn"
-                android:layout_width="0dp"
-                android:layout_weight="1.5"
+                android:layout_width="60dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="0.5dp"
-                android:background="@android:color/white"
-                android:text="검색"/>
+                android:background="@drawable/button_search"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -104,6 +105,11 @@
             android:textAlignment="center"
             android:textColor="@color/colorWhite"
             android:background="@color/colorPosition"/>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button_now"/>
         <LinearLayout
             android:id="@+id/info_box"
             android:layout_width="wrap_content"
