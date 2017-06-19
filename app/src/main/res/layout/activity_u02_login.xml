@@ -8,10 +8,10 @@
     android:gravity="center"
     tools:context="com.example.jaein.unitaxi.u02_Login_Activity">
 
-    <ImageView
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:src="@drawable/login"/>
+    <!--<ImageView-->
+        <!--android:layout_width="250dp"-->
+        <!--android:layout_height="250dp"-->
+        <!--android:src="@drawable/login"/>-->
 
     <EditText
         android:id="@+id/loginId"

@@ -162,46 +162,46 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                 btn.setVisibility(View.VISIBLE);
                 getAddress();
 
-                    tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
-                    marker1 = new TMapMarkerItem();
+                tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
+                marker1 = new TMapMarkerItem();
 
-                    TMapPoint point1 = new TMapPoint(lat1,lon1);
+                TMapPoint point1 = new TMapPoint(lat1,lon1);
 //
 //                    marker1.setTMapPoint(point1);
 //                    tmapview.addMarkerItem("출발지",marker1);
 
-                    marker2 = new TMapMarkerItem();
+                marker2 = new TMapMarkerItem();
 
-                    TMapPoint point2 = new TMapPoint(lat2,lon2);
+                TMapPoint point2 = new TMapPoint(lat2,lon2);
 //
 //                    marker2.setTMapPoint(point2);
 //                    tmapview.addMarkerItem("도착지",marker2);
 
-                    tmapdata.findPathData(point1, point2, new TMapData.FindPathDataListenerCallback() {
-                        @Override
+                tmapdata.findPathData(point1, point2, new TMapData.FindPathDataListenerCallback() {
+                    @Override
                     public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                            tmapview.addTMapPath(tMapPolyLine);
-                            setZoom(tMapPolyLine.getDistance());
+                        tmapview.addTMapPath(tMapPolyLine);
+                        setZoom(tMapPolyLine.getDistance());
 
-                            cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
-                            time=(int)(tMapPolyLine.getDistance()/1000);
-                            if(cost <= 3000){
-                                cost = 3000;
+                        cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
+                        time=(int)(tMapPolyLine.getDistance()/1000);
+                        if(cost <= 3000){
+                            cost = 3000;
+                        }
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().runOnUiThread(new Runnable(){
+                                    @Override
+                                    public void run() {
+                                        fore_time.setText(time+"분");
+                                        fore_money.setText(cost+"원");
+                                        fore_divide_money.setText(cost/4+"원");
+                                    }
+                                });
                             }
-
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getActivity().runOnUiThread(new Runnable(){
-                                        @Override
-                                        public void run() {
-                                            fore_time.setText(time+"분");
-                                            fore_money.setText(cost+"원");
-                                            fore_divide_money.setText(cost/4+"원");
-                                        }
-                                    });
-                                }
-                            }).start();
+                        }).start();
 
                     }
                 });
@@ -220,7 +220,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         //showMarkerPoint();
 
         /* 현재 보는 방향 */
-        tmapview.setCompassMode(true);
+        tmapview.setCompassMode(false);
 
         /* 현위치 아이콘표시 */
         tmapview.setIconVisibility(true);
