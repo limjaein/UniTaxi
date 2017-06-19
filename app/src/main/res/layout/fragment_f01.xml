@@ -67,6 +67,7 @@
                 android:background="@color/colorWhite"
                 android:text="시간"/>
             <ToggleButton
+                android:id="@+id/gobackBtn"
                 android:layout_width="0dp"
                 android:layout_weight="1.5"
                 android:layout_height="match_parent"
@@ -177,7 +178,6 @@
             android:layout_margin="20dp"
             android:layout_gravity="right|bottom"
             android:visibility="invisible"
-            android:onClick="SearchBtnClick"
             android:background="@drawable/button_register" />
     </FrameLayout>
 </LinearLayout>
