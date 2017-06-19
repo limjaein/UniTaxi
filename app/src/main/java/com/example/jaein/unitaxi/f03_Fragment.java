@@ -13,11 +13,9 @@ import android.view.ViewGroup;
  */
 public class f03_Fragment extends Fragment {
 
-
     public f03_Fragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

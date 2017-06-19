@@ -14,6 +14,23 @@ public class u04_Main_Activity extends AppCompatActivity
         f02_Fragment.OnFragmentInteractionListener,
         f03_Fragment.OnFragmentInteractionListener,
         f04_Fragment.OnFragmentInteractionListener {
+    ViewPager viewPager;
+    String Frag;
+
+    public void setFragment(String t){
+        Frag = t;
+    }
+
+    public String getFragment(){
+        return Frag;
+    }
+
+    public ViewPager getViewPager() {
+        if (null == viewPager) {
+            viewPager = (ViewPager) findViewById(R.id.vp_pager);
+        }
+        return viewPager;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +38,7 @@ public class u04_Main_Activity extends AppCompatActivity
         setContentView(R.layout.activity_u04_main);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tl_tabs);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.vp_pager);
+        viewPager = (ViewPager) findViewById(R.id.vp_pager);
 
         Fragment[] arrFragments = new Fragment[4];
         arrFragments[0] = new f01_Fragment();
