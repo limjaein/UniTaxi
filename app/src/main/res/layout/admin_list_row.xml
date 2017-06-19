@@ -70,7 +70,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center">
-            <ImageButton
+            <ImageView
                 android:id="@+id/inBtn"
                 android:layout_width="70dp"
                 android:layout_height="35dp"
