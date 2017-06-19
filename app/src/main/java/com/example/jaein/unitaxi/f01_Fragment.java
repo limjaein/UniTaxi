@@ -51,6 +51,7 @@ import java.util.Locale;
 import static com.example.jaein.unitaxi.u02_Login_Activity.db_manager;
 import static com.example.jaein.unitaxi.u02_Login_Activity.loginId;
 import static com.example.jaein.unitaxi.u02_Login_Activity.loginUni;
+import static java.lang.Math.abs;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -193,100 +194,83 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                 getAddress();
 
                 tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
-                marker1 = new TMapMarkerItem();
 
+
+                //출발지 목적지
                 TMapPoint point1 = new TMapPoint(lat1,lon1);
-//
-//                    marker1.setTMapPoint(point1);
-//                    tmapview.addMarkerItem("출발지",marker1);
-
-                marker2 = new TMapMarkerItem();
-
                 TMapPoint point2 = new TMapPoint(lat2,lon2);
-//
-//                    marker2.setTMapPoint(point2);
-//                    tmapview.addMarkerItem("도착지",marker2);
 
-                tmapdata.findPathData(point1, point2, new TMapData.FindPathDataListenerCallback() {
-                    @Override
-                    public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                        tmapview.addTMapPath(tMapPolyLine);
-                        double small_lat, big_lat, small_lon, big_lon;
+                //경유지 리스트 추가
+                ArrayList<TMapPoint> passList = new ArrayList<TMapPoint>();
+                passList.add(new TMapPoint(37.543470, 127.076327));
+                passList.add(new TMapPoint(37.5520312,127.0874413));
 
-                        if(lat1>lat2){
-                            small_lat=lat2;
-                            big_lat=lat1;
-                        }
-                        else{
-                            small_lat=lat1;
-                            big_lat=lat2;
-                        }
-
-                        if(lon1>lon2){
-                            small_lon=lon2;
-                            big_lon=lon1;
-                        }
-                        else{
-                            small_lon=lon1;
-                            big_lon=lon2;
-                        }
-
-                        TMapPoint zoom_point1=new TMapPoint(small_lat,big_lon);
-                        TMapPoint zoom_point2=new TMapPoint(big_lat,small_lon);
-                        tmapview.zoomToTMapPoint(zoom_point1, zoom_point2);
-
-                        cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
-                        time=(int)(tMapPolyLine.getDistance()/1000);
-                        if(cost <= 3000){
-                            cost = 3000;
-                        }
-
-                        new Thread(new Runnable() {
+                //경유지 함수
+                tmapdata.findMultiPointPathData(point1, point2, passList, 0,
+                        new TMapData.FindPathDataListenerCallback() {
                             @Override
-                            public void run() {
-                                getActivity().runOnUiThread(new Runnable(){
+                            public void onFindPathData(TMapPolyLine tMapPolyLine) {
+
+                                tmapview.addTMapPath(tMapPolyLine);
+
+                                double latSpan = abs(lat1 - lat2);
+
+                                double lonSpan = abs(lon1 - lon2);
+
+                                tmapview.zoomToSpan(latSpan, lonSpan);
+
+                                cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
+                                time=(int)(tMapPolyLine.getDistance()/1000);
+                                if(cost <= 3000){
+                                    cost = 3000;
+                                }
+
+                                new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        fore_time.setText(time+"분");
-                                        fore_money.setText(cost+"원");
-                                        fore_divide_money.setText(cost/4+"원");
+                                        getActivity().runOnUiThread(new Runnable(){
+                                            @Override
+                                            public void run() {
+                                                fore_time.setText(time+"분");
+                                                fore_money.setText(cost+"원");
+                                                fore_divide_money.setText(cost/4+"원");
+                                            }
+                                        });
                                     }
-                                });
+                                }).start();
+
                             }
-                        }).start();
+                        });
+            }
+        });
+
+        taxiBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Query man_query = db_manager.orderByChild("ad_date").equalTo(total_date);
+                man_query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String date = initTime();
+                        manager man = new manager(date, total_time, loginId, "", true, et_addr1.getText().toString(),
+                                et_addr2.getText().toString(), 0);
+
+                        db_manager.child(date).setValue(man);
+                        String TabTag  = ((u04_Main_Activity)getActivity()).getFragment();
+
+                        f01_Fragment frag = (f01_Fragment)getActivity().getSupportFragmentManager().findFragmentByTag(TabTag);
+
+
+                        ((u04_Main_Activity)getActivity()).getViewPager().setCurrentItem(1);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
-
             }
         });
-        taxiBtn.setOnClickListener(new View.OnClickListener(){
-                                       @Override
-                                       public void onClick(View view) {
-                                           Query man_query = db_manager.orderByChild("ad_date").equalTo(total_date);
-                                           man_query.addListenerForSingleValueEvent(new ValueEventListener() {
-                                               @Override
-                                               public void onDataChange(DataSnapshot dataSnapshot) {
-                                                   String date = initTime();
-                                                   manager man = new manager(date, total_time, loginId, "", true, et_addr1.getText().toString(),
-                                                           et_addr2.getText().toString(), 0);
-
-                                                   db_manager.child(date).setValue(man);
-                                                   String TabTag  = ((u04_Main_Activity)getActivity()).getFragment();
-
-                                                   f01_Fragment frag = (f01_Fragment)getActivity().getSupportFragmentManager().findFragmentByTag(TabTag);
-
-
-                                                   ((u04_Main_Activity)getActivity()).getViewPager().setCurrentItem(1);
-                                               }
-
-                                               @Override
-                                               public void onCancelled(DatabaseError databaseError) {
-
-                                               }
-                                           });
-                                       }
-                                   });
         //Tmap 각종 객체 선언
         tmapdata = new TMapData(); //POI검색, 경로검색 등의 지도데이터를 관리하는 클래스
         if (getActivity() != null) {
