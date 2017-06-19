@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -27,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,6 +50,7 @@ import java.util.Locale;
 
 import static com.example.jaein.unitaxi.u02_Login_Activity.db_manager;
 import static com.example.jaein.unitaxi.u02_Login_Activity.loginId;
+import static com.example.jaein.unitaxi.u02_Login_Activity.loginUni;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -91,6 +94,8 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
     String myTag;
 
+    ToggleButton gobackBtn;
+
     public f01_Fragment() {
         // Required empty public constructor
     }
@@ -118,8 +123,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     }
 
     public void getAddress(){
-        et_addr1 = (EditText)getActivity().findViewById(R.id.et_Faddr);
-        et_addr2 = (EditText)getActivity().findViewById(R.id.et_Laddr);
+
 
         Geocoder gc = new Geocoder(getActivity(), Locale.KOREA);
         String addr1 = et_addr1.getText().toString();
@@ -140,7 +144,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             e.printStackTrace();
         }
     }
-    private String initTime()
+    static String initTime()
     {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
         Date now = new Date();
@@ -150,42 +154,37 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         return strDate;
     }
 
-    public void setZoom(double dist){
-//        두사이 거리
-//        0~5km: zoom 13
-//        5km~9km: zoom 12
-//        9km~29km: zoom 11
-//        29km~47km: zoom 10
-//        48km~: zoom 9
-        dist = dist/1000;
-        if(dist>0&&dist<5){
-            tmapview.setZoom(13);
-        }
-        else if(dist>5&&dist<9){
-            tmapview.setZoom(12);
-        }
-        else if(dist>9&&dist<29){
-            tmapview.setZoom(12.5f);
-        }
-        else if(dist>48){
-            tmapview.setZoom(9);
-        }
 
-    }
     public void initMap(){
 
         myTag = getTag();
         ((u04_Main_Activity)getActivity()).setFragment(myTag);
+        et_addr1 = (EditText)getActivity().findViewById(R.id.et_Faddr);
+        et_addr2 = (EditText)getActivity().findViewById(R.id.et_Laddr);
+        et_addr2.setText(loginUni);
 
         taxiBtn = (Button)getActivity().findViewById(R.id.taxiBtn);
         searchBtn = (Button)getActivity().findViewById(R.id.searchBtn);
         info_box = (LinearLayout)getActivity().findViewById(R.id.info_box);
+        gobackBtn = (ToggleButton)getActivity().findViewById(R.id.gobackBtn);
 
 
         fore_time = (TextView)getActivity().findViewById(R.id.fore_time);
         fore_money = (TextView)getActivity().findViewById(R.id.fore_money);
         fore_divide_money = (TextView)getActivity().findViewById(R.id.fore_divide_money);
 
+        gobackBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){ // 등교
+                    et_addr1.setText(loginUni);
+                    et_addr2.setText("");
+                }else{
+                    et_addr2.setText(loginUni);
+                    et_addr1.setText("");
+                }
+            }
+        });
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -193,63 +192,86 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                 taxiBtn.setVisibility(View.VISIBLE);
                 getAddress();
 
-                    tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
-                    marker1 = new TMapMarkerItem();
+                tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
+                marker1 = new TMapMarkerItem();
 
-                    TMapPoint point1 = new TMapPoint(lat1,lon1);
+                TMapPoint point1 = new TMapPoint(lat1,lon1);
 //
 //                    marker1.setTMapPoint(point1);
 //                    tmapview.addMarkerItem("출발지",marker1);
 
-                    marker2 = new TMapMarkerItem();
+                marker2 = new TMapMarkerItem();
 
-                    TMapPoint point2 = new TMapPoint(lat2,lon2);
+                TMapPoint point2 = new TMapPoint(lat2,lon2);
 //
 //                    marker2.setTMapPoint(point2);
 //                    tmapview.addMarkerItem("도착지",marker2);
 
-                    tmapdata.findPathData(point1, point2, new TMapData.FindPathDataListenerCallback() {
-                        @Override
+                tmapdata.findPathData(point1, point2, new TMapData.FindPathDataListenerCallback() {
+                    @Override
                     public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                            tmapview.addTMapPath(tMapPolyLine);
-                            setZoom(tMapPolyLine.getDistance());
+                        tmapview.addTMapPath(tMapPolyLine);
+                        double small_lat, big_lat, small_lon, big_lon;
 
-                            cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
-                            time=(int)(tMapPolyLine.getDistance()/1000);
-                            if(cost <= 3000){
-                                cost = 3000;
+                        if(lat1>lat2){
+                            small_lat=lat2;
+                            big_lat=lat1;
+                        }
+                        else{
+                            small_lat=lat1;
+                            big_lat=lat2;
+                        }
+
+                        if(lon1>lon2){
+                            small_lon=lon2;
+                            big_lon=lon1;
+                        }
+                        else{
+                            small_lon=lon1;
+                            big_lon=lon2;
+                        }
+
+                        TMapPoint zoom_point1=new TMapPoint(small_lat,big_lon);
+                        TMapPoint zoom_point2=new TMapPoint(big_lat,small_lon);
+                        tmapview.zoomToTMapPoint(zoom_point1, zoom_point2);
+
+                        cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
+                        time=(int)(tMapPolyLine.getDistance()/1000);
+                        if(cost <= 3000){
+                            cost = 3000;
+                        }
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().runOnUiThread(new Runnable(){
+                                    @Override
+                                    public void run() {
+                                        fore_time.setText(time+"분");
+                                        fore_money.setText(cost+"원");
+                                        fore_divide_money.setText(cost/4+"원");
+                                    }
+                                });
                             }
-
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getActivity().runOnUiThread(new Runnable(){
-                                        @Override
-                                        public void run() {
-                                            fore_time.setText(time+"분");
-                                            fore_money.setText(cost+"원");
-                                            fore_divide_money.setText(cost/4+"원");
-                                        }
-                                    });
-                                }
-                            }).start();
+                        }).start();
 
                     }
                 });
 
             }
         });
-        taxiBtn.setOnClickListener(new View.OnClickListener() {
+        taxiBtn.setOnClickListener(new View.OnClickListener(){
                                        @Override
                                        public void onClick(View view) {
-                                           Query man_query = db_manager.orderByChild("admin_info").equalTo(total_date);
+                                           Query man_query = db_manager.orderByChild("ad_date").equalTo(total_date);
                                            man_query.addListenerForSingleValueEvent(new ValueEventListener() {
                                                @Override
                                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                                   manager man = new manager(total_date, total_time, loginId, "", true, et_addr1.getText().toString(),
+                                                   String date = initTime();
+                                                   manager man = new manager(date, total_time, loginId, "", true, et_addr1.getText().toString(),
                                                            et_addr2.getText().toString(), 0);
 
-                                                   db_manager.child(initTime()).setValue(man);
+                                                   db_manager.child(date).setValue(man);
                                                    String TabTag  = ((u04_Main_Activity)getActivity()).getFragment();
 
                                                    f01_Fragment frag = (f01_Fragment)getActivity().getSupportFragmentManager().findFragmentByTag(TabTag);
@@ -277,7 +299,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         //showMarkerPoint();
 
         /* 현재 보는 방향 */
-        tmapview.setCompassMode(true);
+        tmapview.setCompassMode(false);
 
         /* 현위치 아이콘표시 */
         tmapview.setIconVisibility(true);

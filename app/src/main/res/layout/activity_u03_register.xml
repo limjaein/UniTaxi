@@ -8,10 +8,10 @@
     android:gravity="center"
     tools:context="com.example.jaein.unitaxi.u03_Register_Activity">
 
-    <ImageView
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:src="@drawable/login"/>
+    <!--<ImageView-->
+        <!--android:layout_width="150dp"-->
+        <!--android:layout_height="150dp"-->
+        <!--android:src="@drawable/login"/>-->
     <LinearLayout
         android:layout_width="200dp"
         android:layout_height="wrap_content"

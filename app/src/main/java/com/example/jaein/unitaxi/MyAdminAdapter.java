@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import static com.example.jaein.unitaxi.f02_Fragment.admin_list;
 import static com.example.jaein.unitaxi.u02_Login_Activity.db_manager;
 import static com.example.jaein.unitaxi.u02_Login_Activity.loginId;
-import static com.example.jaein.unitaxi.u02_Login_Activity.loginUni;
 
 /**
  * Created by jaein on 2017-06-09.
@@ -28,7 +27,7 @@ public class MyAdminAdapter extends BaseAdapter{
     int layout;
     LayoutInflater lf;
 
-    TextView tv_dest, tv_goback, tv_pos, tv_date, tv_time, tv_number;
+    TextView tv_dest, tv_source, tv_date, tv_time, tv_number;
 
     public MyAdminAdapter(Context context, int layout, ArrayList<manager> data){
         this.data = data;
@@ -57,38 +56,29 @@ public class MyAdminAdapter extends BaseAdapter{
             convertView = lf.inflate(R.layout.admin_list_row,null);
         }
 
-        tv_dest = (TextView) convertView.findViewById(R.id.L_university);
-        tv_goback = (TextView) convertView.findViewById(R.id.L_goback);
-        tv_pos = (TextView) convertView.findViewById(R.id.L_place);
+        tv_dest = (TextView) convertView.findViewById(R.id.L_dest);
+        tv_source = (TextView) convertView.findViewById(R.id.L_source);
         tv_date = (TextView) convertView.findViewById(R.id.date);
         tv_time = (TextView) convertView.findViewById(R.id.time);
         tv_number = (TextView) convertView.findViewById(R.id.L_number);
         final ImageButton Btn = (ImageButton)convertView.findViewById(R.id.inBtn);
 
-        tv_dest.setText(loginUni);
 
-        String goback = "";
-        if(data.get(position).getAd_goback()){ // 1일경우 등교
-            goback = "등교";
-        }
-        else
-            goback = "하교";
-        tv_goback.setText(goback);
-        tv_pos.setText(
-                data.get(position).getAd_source()+"."+data.get(position).getAd_dest()
-        );
         String date = "";
         date += data.get(position).getAd_date().substring(0,4)+"년 ";
-        date += data.get(position).getAd_date().substring(3,5)+"월 ";
-        date += data.get(position).getAd_date().substring(5,7)+"일";
+        date += data.get(position).getAd_date().substring(4,6)+"월 ";
+        date += data.get(position).getAd_date().substring(6,8)+"일";
 
-        tv_date.setText(data.get(position).getAd_date());
+        tv_date.setText(date);
         String time = "";
         time += data.get(position).getAd_time().substring(0,2)+"시";
         time += data.get(position).getAd_time().substring(2,4)+"분";
 
         tv_time.setText(time);
         tv_number.setText(data.get(position).getAd_partNum()+"명");
+
+        tv_dest.setText(data.get(position).getAd_dest());
+        tv_source.setText(data.get(position).getAd_source());
 
         // 버튼 체크
         manager check = admin_list.get(position);
