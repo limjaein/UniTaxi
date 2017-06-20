@@ -41,12 +41,12 @@ public class f02_Fragment extends Fragment {
         return inflater.inflate(R.layout.fragment_f02, container, false);
     }
 
-    public void getData(){
+    public void getData(){//정보다가져오는거
         Query admin_query = db_manager.orderByChild("ad_date");
         admin_list.clear();
         admin_query.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) {//데이타바뀔떄마다
                 admin_list.clear();
                 for(DataSnapshot data : dataSnapshot.getChildren()) {
                     if(data.getValue()!=null){
@@ -80,21 +80,7 @@ public class f02_Fragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         admin_list = new ArrayList<>();
         listView = (ListView)getActivity().findViewById(R.id.listView);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), (position + 1) + " : Click", Toast.LENGTH_LONG).show();
-            }
-        });
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                           int position, long id) {
-                Toast.makeText(getActivity(), (position + 1) + " : Long Click", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), u05_User_Activity.class);
-                intent.putExtra("position", position + 1);
-                startActivity(intent);
-                return true;
-            }
-        });
+
         getData();
     }
 }

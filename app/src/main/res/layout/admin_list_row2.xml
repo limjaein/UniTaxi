@@ -9,7 +9,7 @@
         android:background="@color/colorWhite"
         android:gravity="center">
         <!--<ImageView
-            android:id="@+id/L_image"
+            android:id="@+id/L_image2"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:src="@drawable/university_ku" />-->
@@ -25,7 +25,7 @@
                 android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
                 <TextView
-                    android:id="@+id/L_source"
+                    android:id="@+id/L_source2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="건국대학교"
@@ -38,7 +38,7 @@
                     android:textSize="15dp"
                     android:textStyle="bold" />
                 <TextView
-                    android:id="@+id/L_dest"
+                    android:id="@+id/L_dest2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="잠실"
@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:id="@+id/date"
+                    android:id="@+id/date2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="17.6.4" />
@@ -58,43 +58,13 @@
                     android:layout_height="wrap_content"
                     android:text=" / " />
                 <TextView
-                    android:id="@+id/time"
+                    android:id="@+id/time2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="9:00 - 9:30" />
+                    android:text="9:00 -  9:30" />
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center">
-            <ImageView
-                android:id="@+id/inBtn"
-                android:layout_width="70dp"
-                android:layout_height="35dp"
-                android:scaleType="fitCenter"
-                android:background="@android:color/transparent"
-                android:src="@drawable/button_in"/>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/L_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1명" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" / " />
-                <TextView
-                    android:id="@+id/L_total_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="4명" />
-            </LinearLayout>
-        </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>

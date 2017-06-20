@@ -7,13 +7,13 @@ package com.example.jaein.unitaxi;
 public class manager {
     private String ad_date;
     private String ad_time;
-    private String ad_master;
+    private String ad_master;//방만든사람이름 ==로그인아디
     private String ad_people;
     private boolean ad_goback;
     private String ad_source;
     private String ad_dest;
     private int ad_partNum;
-    private boolean ad_check; // 방의 존재 유무
+    private boolean ad_check; // 방의 존재 유무  에드체크가 false 일때만
 
     manager(){
     }

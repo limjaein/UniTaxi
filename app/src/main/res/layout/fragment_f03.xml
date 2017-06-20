@@ -1,7 +1,17 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<?xml version="1.0"?>
+<LinearLayout
+    android:baselineAligned="false"
+    tools:context="com.example.jaein.unitaxi.f03_Fragment"
+    android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context="com.example.jaein.unitaxi.f03_Fragment">
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-</FrameLayout>
+    <ListView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/listView2">
+    </ListView>
+
+</LinearLayout>
