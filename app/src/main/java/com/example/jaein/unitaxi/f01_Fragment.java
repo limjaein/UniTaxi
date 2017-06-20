@@ -131,8 +131,10 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (data.getValue() != null) {
                         manager m = data.getValue(manager.class);
-                        admin_list.add(m);
+                        if(m.getAd_check())
+                            admin_list.add(m);
                     }
+
                 }
                 manager man = admin_list.get(pos);
                 et_addr1.setText(man.getAd_source());
@@ -152,6 +154,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                 //startLocationService();
 
                 passList.add(new TMapPoint(latitude, longitude));
+                passList.add(new TMapPoint(37.561939, 127.035224));
 
                 //경유지 함수
                 tmapdata.findMultiPointPathData(point1, point2, passList, 0,
@@ -168,7 +171,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                                 tmapview.zoomToSpan(latSpan, lonSpan);
 
                                 cost = (int) (2400 + (tMapPolyLine.getDistance() - 2000) * 100 / 144);
-                                time = (int) (tMapPolyLine.getDistance() / 1000);
+                                time = (int) (tMapPolyLine.getDistance() / 666);
                                 if (cost <= 3000) {
                                     cost = 3000;
                                 }
@@ -286,9 +289,9 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
         /* 현재 보는 방향 */
         tmapview.setCompassMode(false);
-
-        /* 현위치 아이콘표시 */
-        tmapview.setIconVisibility(true);
+//
+//        /* 현위치 아이콘표시 */
+//        tmapview.setIconVisibility(true);
 
         /* 줌레벨 */
         tmapview.setZoomLevel(15);

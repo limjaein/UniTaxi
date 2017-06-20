@@ -93,7 +93,7 @@ public class u04_Main_Activity extends AppCompatActivity
                 case 1:
                     return "관리";
                 case 2:
-                    return "알림";
+                    return "기록";
                 case 3:
                     return "설정";
                 default:
