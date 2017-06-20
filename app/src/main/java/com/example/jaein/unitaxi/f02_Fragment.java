@@ -78,11 +78,24 @@ public class f02_Fragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        init();
+
+        getData();
+    }
+
+    private void init() {
         admin_list = new ArrayList<>();
         listView = (ListView)getActivity().findViewById(R.id.listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), (position + 1) + " : Click", Toast.LENGTH_LONG).show();
+
+                String Tab = ((u04_Main_Activity)getActivity()).getFragment();
+
+                f01_Fragment Frag = (f01_Fragment)getActivity().getSupportFragmentManager().findFragmentByTag(Tab);
+
+                Frag.setClickedData(position);
+
+                ((u04_Main_Activity)getActivity()).getViewPager().setCurrentItem(0);
             }
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -95,6 +108,5 @@ public class f02_Fragment extends Fragment {
                 return true;
             }
         });
-        getData();
     }
 }

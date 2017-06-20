@@ -50,6 +50,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.jaein.unitaxi.f02_Fragment.admin_list;
 import static com.example.jaein.unitaxi.u02_Login_Activity.db_manager;
 import static com.example.jaein.unitaxi.u02_Login_Activity.loginId;
 import static com.example.jaein.unitaxi.u02_Login_Activity.loginUni;
@@ -75,7 +76,6 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     private ArrayList<String> mArrayMarkerID = new ArrayList<String>();
     private ArrayList<MapPoint> m_mapPoint = new ArrayList<MapPoint>();
 
-    private String address;
     double lat1, lat2;
     double lon1, lon2;
 
@@ -121,92 +121,27 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         return containerView;
     }
 
-    public interface OnFragmentInteractionListener {
-
-    }
-
-    /// tmap gps listener
-    @Override
-    public void onLocationChange(Location location) {
-        if (m_bTrackingMode) {
-            tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
-        }
-    }
-
-    public void getAddress() {
-
-
-        Geocoder gc = new Geocoder(getActivity(), Locale.KOREA);
-        String addr1 = et_addr1.getText().toString();
-        String addr2 = et_addr2.getText().toString();
-
-
-        try {
-            List<Address> addrList1 = gc.getFromLocationName(addr1, 5);
-            List<Address> addrList2 = gc.getFromLocationName(addr2, 5);
-            if (addrList1 != null && addrList2 != null) {
-                lat1 = addrList1.get(0).getLatitude();
-                lon1 = addrList1.get(0).getLongitude();
-
-                lat2 = addrList2.get(0).getLatitude();
-                lon2 = addrList2.get(0).getLongitude();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    static String initTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        Date now = new Date();
-
-        String strDate = formatter.format(now);
-
-        return strDate;
-    }
-
-
-    public void initMap() {
-
-        myTag = getTag();
-        ((u04_Main_Activity) getActivity()).setFragment(myTag);
-        et_addr1 = (EditText) getActivity().findViewById(R.id.et_Faddr);
-        et_addr2 = (EditText) getActivity().findViewById(R.id.et_Laddr);
-        et_addr2.setText(loginUni);
-
-        taxiBtn = (Button) getActivity().findViewById(R.id.taxiBtn);
-        searchBtn = (Button) getActivity().findViewById(R.id.searchBtn);
-        info_box = (LinearLayout) getActivity().findViewById(R.id.info_box);
-        gobackBtn = (ToggleButton) getActivity().findViewById(R.id.gobackBtn);
-
-        nowBtn = (Button)getActivity().findViewById(R.id.nowBtn);
-
-
-        fore_time = (TextView) getActivity().findViewById(R.id.fore_time);
-        fore_money = (TextView) getActivity().findViewById(R.id.fore_money);
-        fore_divide_money = (TextView) getActivity().findViewById(R.id.fore_divide_money);
-
-        gobackBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+    public void setClickedData(final int pos) {
+        Query admin_query = db_manager.orderByChild("ad_date");
+        admin_list.clear();
+        admin_query.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) { // 등교
-                    et_addr1.setText(loginUni);
-                    et_addr2.setText("");
-                } else {
-                    et_addr2.setText(loginUni);
-                    et_addr1.setText("");
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                admin_list.clear();
+                for(DataSnapshot data : dataSnapshot.getChildren()) {
+                    if(data.getValue()!=null){
+                        manager m = data.getValue(manager.class);
+                        admin_list.add(m);
+                    }
                 }
-            }
-        });
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                manager man = admin_list.get(pos);
+                et_addr1.setText(man.getAd_source());
+                et_addr2.setText(man.getAd_dest());
+
+                getAddress(man.getAd_source(), man.getAd_dest());
+
                 info_box.setVisibility(View.VISIBLE);
-                taxiBtn.setVisibility(View.VISIBLE);
-                getAddress();
-
                 tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
-
 
                 //출발지 목적지
                 TMapPoint point1 = new TMapPoint(lat1,lon1);
@@ -214,8 +149,9 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
                 //경유지 리스트 추가
                 ArrayList<TMapPoint> passList = new ArrayList<TMapPoint>();
-                passList.add(new TMapPoint(37.543470, 127.076327));
-                passList.add(new TMapPoint(37.5520312,127.0874413));
+                //startLocationService();
+
+                passList.add(new TMapPoint(latitude, longitude));
 
                 //경유지 함수
                 tmapdata.findMultiPointPathData(point1, point2, passList, 0,
@@ -254,35 +190,84 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                             }
                         });
             }
-        });
 
-        taxiBtn.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View view) {
-                Query man_query = db_manager.orderByChild("ad_date").equalTo(total_date);
-                man_query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        String date = initTime();
-                        manager man = new manager(date, total_time, loginId, "", true, et_addr1.getText().toString(),
-                                et_addr2.getText().toString(), 0);
+            public void onCancelled(DatabaseError databaseError) {
 
-                        db_manager.child(date).setValue(man);
-                        String TabTag  = ((u04_Main_Activity)getActivity()).getFragment();
-
-                        f01_Fragment frag = (f01_Fragment)getActivity().getSupportFragmentManager().findFragmentByTag(TabTag);
-
-
-                        ((u04_Main_Activity)getActivity()).getViewPager().setCurrentItem(1);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
             }
         });
+
+    }
+
+
+
+    public interface OnFragmentInteractionListener {
+
+    }
+
+    /// tmap gps listener
+    @Override
+    public void onLocationChange(Location location) {
+        if (m_bTrackingMode) {
+            tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
+        }
+    }
+
+    public void getAddress(String addr1, String addr2) {
+
+
+        Geocoder gc = new Geocoder(getActivity(), Locale.KOREA);
+
+
+        try {
+            List<Address> addrList1 = gc.getFromLocationName(addr1, 5);
+            List<Address> addrList2 = gc.getFromLocationName(addr2, 5);
+            if (addrList1 != null && addrList2 != null) {
+                lat1 = addrList1.get(0).getLatitude();
+                lon1 = addrList1.get(0).getLongitude();
+
+                lat2 = addrList2.get(0).getLatitude();
+                lon2 = addrList2.get(0).getLongitude();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void getAddress() {
+
+
+        Geocoder gc = new Geocoder(getActivity(), Locale.KOREA);
+        String addr1 = et_addr1.getText().toString();
+        String addr2 = et_addr2.getText().toString();
+
+
+        try {
+            List<Address> addrList1 = gc.getFromLocationName(addr1, 5);
+            List<Address> addrList2 = gc.getFromLocationName(addr2, 5);
+            if (addrList1 != null && addrList2 != null) {
+                lat1 = addrList1.get(0).getLatitude();
+                lon1 = addrList1.get(0).getLongitude();
+
+                lat2 = addrList2.get(0).getLatitude();
+                lon2 = addrList2.get(0).getLongitude();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static String initTime() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        Date now = new Date();
+
+        String strDate = formatter.format(now);
+
+        return strDate;
+    }
+
+
+    public void initMap() {
+
         //Tmap 각종 객체 선언
         tmapdata = new TMapData(); //POI검색, 경로검색 등의 지도데이터를 관리하는 클래스
         if (getActivity() != null) {
@@ -346,7 +331,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     {
         manager=(LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        long minTime=1000;
+        long minTime=10;
         float minDistance=1;
 
         if(ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED
@@ -377,10 +362,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             latitude=location.getLatitude();
             longitude=location.getLongitude();
             tmapview.setCenterPoint(longitude, latitude);
-            Toast.makeText(getActivity(), latitude+" "+longitude, Toast.LENGTH_SHORT).show();
-            marker1 = new TMapMarkerItem();
-            marker1.setPosition(Float.parseFloat(latitude+""), Float.parseFloat(longitude+""));
-            tmapview.addMarkerItem("현재위치",marker1);
+
             stopLocationService();
         }
 
@@ -404,6 +386,12 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        init();
+
+        initMap();
+    }
+
+    private void init() {
         final Button datePicker = (Button) getActivity().findViewById(R.id.datepicker);
         final Button timePicker = (Button) getActivity().findViewById(R.id.timepicker);
 
@@ -456,7 +444,117 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                 dlgTime.show();
             }
         });
-        initMap();
+
+
+        myTag = getTag();
+        ((u04_Main_Activity) getActivity()).setFragment(myTag);
+        et_addr1 = (EditText) getActivity().findViewById(R.id.et_Faddr);
+        et_addr2 = (EditText) getActivity().findViewById(R.id.et_Laddr);
+        et_addr2.setText(loginUni);
+
+        taxiBtn = (Button) getActivity().findViewById(R.id.taxiBtn);
+        searchBtn = (Button) getActivity().findViewById(R.id.searchBtn);
+        info_box = (LinearLayout) getActivity().findViewById(R.id.info_box);
+        gobackBtn = (ToggleButton) getActivity().findViewById(R.id.gobackBtn);
+
+        nowBtn = (Button)getActivity().findViewById(R.id.nowBtn);
+
+
+        fore_time = (TextView) getActivity().findViewById(R.id.fore_time);
+        fore_money = (TextView) getActivity().findViewById(R.id.fore_money);
+        fore_divide_money = (TextView) getActivity().findViewById(R.id.fore_divide_money);
+
+        gobackBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) { // 등교
+                    et_addr1.setText(loginUni);
+                    et_addr2.setText("");
+                } else {
+                    et_addr2.setText(loginUni);
+                    et_addr1.setText("");
+                }
+            }
+        });
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                info_box.setVisibility(View.VISIBLE);
+                taxiBtn.setVisibility(View.VISIBLE);
+                getAddress();
+
+                tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
+
+
+                //출발지 목적지
+                TMapPoint point1 = new TMapPoint(lat1,lon1);
+                TMapPoint point2 = new TMapPoint(lat2,lon2);
+
+                //경유지 리스트 추가
+                ArrayList<TMapPoint> passList = new ArrayList<TMapPoint>();
+
+                //경유지 함수
+                tmapdata.findMultiPointPathData(point1, point2, passList, 0,
+                        new TMapData.FindPathDataListenerCallback() {
+                            @Override
+                            public void onFindPathData(TMapPolyLine tMapPolyLine) {
+
+                                tmapview.addTMapPath(tMapPolyLine);
+
+                                double latSpan = abs(lat1 - lat2);
+
+                                double lonSpan = abs(lon1 - lon2);
+
+                                tmapview.zoomToSpan(latSpan, lonSpan);
+
+                                cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
+                                time=(int)(tMapPolyLine.getDistance()/1000);
+                                if(cost <= 3000){
+                                    cost = 3000;
+                                }
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getActivity().runOnUiThread(new Runnable(){
+                                            @Override
+                                            public void run() {
+                                                fore_time.setText(time+"분");
+                                                fore_money.setText(cost+"원");
+                                                fore_divide_money.setText(cost/4+"원");
+                                            }
+                                        });
+                                    }
+                                }).start();
+
+                            }
+                        });
+            }
+        });
+
+        taxiBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Query man_query = db_manager.orderByChild("ad_date").equalTo(total_date);
+                        man_query.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                String date = initTime();
+                                manager man = new manager(date, total_time, loginId, "", true, et_addr1.getText().toString(),
+                                        et_addr2.getText().toString(), 0);
+
+                        db_manager.child(date).setValue(man);
+
+                        ((u04_Main_Activity)getActivity()).getViewPager().setCurrentItem(1);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
     }
 
 
