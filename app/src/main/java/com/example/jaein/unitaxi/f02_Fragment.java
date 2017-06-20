@@ -41,12 +41,12 @@ public class f02_Fragment extends Fragment {
         return inflater.inflate(R.layout.fragment_f02, container, false);
     }
 
-    public void getData(){//정보다가져오는거
+    public void getData(){
         Query admin_query = db_manager.orderByChild("ad_date");
         admin_list.clear();
         admin_query.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {//데이타바뀔떄마다
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 admin_list.clear();
                 for(DataSnapshot data : dataSnapshot.getChildren()) {
                     if(data.getValue()!=null){
@@ -78,9 +78,35 @@ public class f02_Fragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        admin_list = new ArrayList<>();
-        listView = (ListView)getActivity().findViewById(R.id.listView);
+        init();
 
         getData();
+    }
+
+    private void init() {
+        admin_list = new ArrayList<>();
+        listView = (ListView)getActivity().findViewById(R.id.listView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String Tab = ((u04_Main_Activity)getActivity()).getFragment();
+
+                f01_Fragment Frag = (f01_Fragment)getActivity().getSupportFragmentManager().findFragmentByTag(Tab);
+
+                Frag.setClickedData(position);
+
+                ((u04_Main_Activity)getActivity()).getViewPager().setCurrentItem(0);
+            }
+        });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                           int position, long id) {
+                Toast.makeText(getActivity(), (position + 1) + " : Long Click", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), u05_User_Activity.class);
+                intent.putExtra("position", position + 1);
+                startActivity(intent);
+                return true;
+            }
+        });
     }
 }
