@@ -1,7 +1,6 @@
 package com.example.jaein.unitaxi;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -51,7 +49,9 @@ public class f02_Fragment extends Fragment {
                 for(DataSnapshot data : dataSnapshot.getChildren()) {
                     if(data.getValue()!=null){
                         manager m = data.getValue(manager.class);
-                        admin_list.add(m);
+                        if(m.getAd_check()) {
+                            admin_list.add(m);
+                        }
                     }
                 }
                 // 정보 처리 완료
@@ -101,11 +101,50 @@ public class f02_Fragment extends Fragment {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            int position, long id) {
-                Toast.makeText(getActivity(), (position + 1) + " : Long Click", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), u05_User_Activity.class);
-                intent.putExtra("position", position + 1);
-                startActivity(intent);
+                DeleteData(position);
                 return true;
+            }
+
+        });
+    }
+
+    public void DeleteData(final int pos){
+        Query admin_query = db_manager.orderByChild("ad_date");
+        admin_list.clear();
+        admin_query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                admin_list.clear();
+                for(DataSnapshot data : dataSnapshot.getChildren()) {
+                    if(data.getValue()!=null){
+                        manager m = data.getValue(manager.class);
+                        if(m.getAd_check()) {
+                            admin_list.add(m);
+                        }
+                     }
+                }
+                if(admin_list.size()!=0){
+                    admin_list.get(pos).setAd_check(false);
+                    db_manager.child(admin_list.get(pos).getAd_date()).setValue(admin_list.get(pos));
+                }
+
+
+                // 정보 처리 완료
+                if (getActivity() != null) {
+
+                    MyAdminAdapter adapter = new MyAdminAdapter(
+                            getActivity(),
+                            R.layout.admin_list_row,
+                            admin_list
+                    );
+
+                    listView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }
