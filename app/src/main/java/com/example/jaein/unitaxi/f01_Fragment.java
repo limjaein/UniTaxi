@@ -38,7 +38,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.skp.Tmap.TMapData;
 import com.skp.Tmap.TMapGpsManager;
-import com.skp.Tmap.TMapMarkerItem;
 import com.skp.Tmap.TMapPoint;
 import com.skp.Tmap.TMapPolyLine;
 import com.skp.Tmap.TMapView;
@@ -61,7 +60,8 @@ import static java.lang.Math.abs;
  */
 
 
-public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationChangedCallback {
+public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationChangedCallback,
+        TMapData.ConvertGPSToAddressListenerCallback {
 
     private Context mContext = null;
     private boolean m_bTrackingMode = true;
@@ -88,8 +88,8 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
     LocationManager manager;
 
     EditText et_addr1, et_addr2;
+    Button et_addr3;
     FrameLayout framelayout;
-    TMapMarkerItem marker1, marker2;
 
     private int myYear, myMonth, myDay, myHour, myMinute;
 
@@ -128,8 +128,8 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 admin_list.clear();
-                for(DataSnapshot data : dataSnapshot.getChildren()) {
-                    if(data.getValue()!=null){
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (data.getValue() != null) {
                         manager m = data.getValue(manager.class);
                         admin_list.add(m);
                     }
@@ -141,11 +141,11 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                 getAddress(man.getAd_source(), man.getAd_dest());
 
                 info_box.setVisibility(View.VISIBLE);
-                tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
+                tmapview.setCenterPoint((lon1 + lon2) / 2, (lat1 + lat2) / 2, true);
 
                 //출발지 목적지
-                TMapPoint point1 = new TMapPoint(lat1,lon1);
-                TMapPoint point2 = new TMapPoint(lat2,lon2);
+                TMapPoint point1 = new TMapPoint(lat1, lon1);
+                TMapPoint point2 = new TMapPoint(lat2, lon2);
 
                 //경유지 리스트 추가
                 ArrayList<TMapPoint> passList = new ArrayList<TMapPoint>();
@@ -167,21 +167,21 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
                                 tmapview.zoomToSpan(latSpan, lonSpan);
 
-                                cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
-                                time=(int)(tMapPolyLine.getDistance()/1000);
-                                if(cost <= 3000){
+                                cost = (int) (2400 + (tMapPolyLine.getDistance() - 2000) * 100 / 144);
+                                time = (int) (tMapPolyLine.getDistance() / 1000);
+                                if (cost <= 3000) {
                                     cost = 3000;
                                 }
 
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        getActivity().runOnUiThread(new Runnable(){
+                                        getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                fore_time.setText(time+"분");
-                                                fore_money.setText(cost+"원");
-                                                fore_divide_money.setText(cost/4+"원");
+                                                fore_time.setText(time + "분");
+                                                fore_money.setText(cost + "원");
+                                                fore_divide_money.setText(cost / 4 + "원");
                                             }
                                         });
                                     }
@@ -199,6 +199,10 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
     }
 
+    @Override
+    public void onConvertToGPSToAddress(String s) {
+
+    }
 
 
     public interface OnFragmentInteractionListener {
@@ -233,6 +237,7 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             e.printStackTrace();
         }
     }
+
     public void getAddress() {
 
 
@@ -315,9 +320,6 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             ///////////
             tmapgps.OpenGps();
 
-            /*  화면중심을 단말의 현재위치로 이동 */
-            tmapview.setTrackingMode(true);
-            tmapview.setSightVisible(true);
         }
         nowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -327,60 +329,31 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         });
     }
 
-    private void startLocationService()
-    {
-        manager=(LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+    private void startLocationService() {
+        manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        long minTime=10;
-        float minDistance=1;
+        long minTime = 10;
+        float minDistance = 1;
 
-        if(ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
-        {
-            Toast.makeText(getActivity(),"Don't have permissions.", Toast.LENGTH_LONG).show();
+        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getActivity(), "Don't have permissions.", Toast.LENGTH_LONG).show();
             return;
         }
 
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,minTime,minDistance,mLocationListener);
-        manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,minTime,minDistance,mLocationListener);
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, mLocationListener);
+        manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime, minDistance, mLocationListener);
     }
 
-    private void stopLocationService()
-    {
-        if(ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
-        {
-            Toast.makeText(getActivity(),"Don't have permissions.", Toast.LENGTH_LONG).show();
+    private void stopLocationService() {
+        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getActivity(), "Don't have permissions.", Toast.LENGTH_LONG).show();
             return;
         }
         manager.removeUpdates(mLocationListener);
     }
 
-    private final LocationListener mLocationListener=new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            latitude=location.getLatitude();
-            longitude=location.getLongitude();
-            tmapview.setCenterPoint(longitude, latitude);
-
-            stopLocationService();
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
-    };
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -451,13 +424,14 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         et_addr1 = (EditText) getActivity().findViewById(R.id.et_Faddr);
         et_addr2 = (EditText) getActivity().findViewById(R.id.et_Laddr);
         et_addr2.setText(loginUni);
+        et_addr3 = (Button) getActivity().findViewById(R.id.et_Caddr);
 
         taxiBtn = (Button) getActivity().findViewById(R.id.taxiBtn);
         searchBtn = (Button) getActivity().findViewById(R.id.searchBtn);
         info_box = (LinearLayout) getActivity().findViewById(R.id.info_box);
         gobackBtn = (ToggleButton) getActivity().findViewById(R.id.gobackBtn);
 
-        nowBtn = (Button)getActivity().findViewById(R.id.nowBtn);
+        nowBtn = (Button) getActivity().findViewById(R.id.nowBtn);
 
 
         fore_time = (TextView) getActivity().findViewById(R.id.fore_time);
@@ -483,12 +457,12 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
                 taxiBtn.setVisibility(View.VISIBLE);
                 getAddress();
 
-                tmapview.setCenterPoint((lon1+lon2)/2,(lat1+lat2)/2,true);
+                tmapview.setCenterPoint((lon1 + lon2) / 2, (lat1 + lat2) / 2, true);
 
 
                 //출발지 목적지
-                TMapPoint point1 = new TMapPoint(lat1,lon1);
-                TMapPoint point2 = new TMapPoint(lat2,lon2);
+                TMapPoint point1 = new TMapPoint(lat1, lon1);
+                TMapPoint point2 = new TMapPoint(lat2, lon2);
 
                 //경유지 리스트 추가
                 ArrayList<TMapPoint> passList = new ArrayList<TMapPoint>();
@@ -507,21 +481,21 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
 
                                 tmapview.zoomToSpan(latSpan, lonSpan);
 
-                                cost=(int) (2400 + (tMapPolyLine.getDistance()-2000)*100/144);
-                                time=(int)(tMapPolyLine.getDistance()/1000);
-                                if(cost <= 3000){
+                                cost = (int) (2400 + (tMapPolyLine.getDistance() - 2000) * 100 / 144);
+                                time = (int) (tMapPolyLine.getDistance() / 1000);
+                                if (cost <= 3000) {
                                     cost = 3000;
                                 }
 
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        getActivity().runOnUiThread(new Runnable(){
+                                        getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                fore_time.setText(time+"분");
-                                                fore_money.setText(cost+"원");
-                                                fore_divide_money.setText(cost/4+"원");
+                                                fore_time.setText(time + "분");
+                                                fore_money.setText(cost + "원");
+                                                fore_divide_money.setText(cost / 4 + "원");
                                             }
                                         });
                                     }
@@ -532,20 +506,20 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
             }
         });
 
-        taxiBtn.setOnClickListener(new View.OnClickListener(){
+        taxiBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Query man_query = db_manager.orderByChild("ad_date").equalTo(total_date);
-                        man_query.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                String date = initTime();
-                                manager man = new manager(date, total_time, loginId, "", true, et_addr1.getText().toString(),
-                                        et_addr2.getText().toString(), 0);
+                man_query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String date = initTime();
+                        manager man = new manager(date, total_time, loginId, "", true, et_addr1.getText().toString(),
+                                et_addr2.getText().toString(), 0);
 
                         db_manager.child(date).setValue(man);
 
-                        ((u04_Main_Activity)getActivity()).getViewPager().setCurrentItem(1);
+                        ((u04_Main_Activity) getActivity()).getViewPager().setCurrentItem(1);
                     }
 
                     @Override
@@ -557,5 +531,55 @@ public class f01_Fragment extends Fragment implements TMapGpsManager.onLocationC
         });
     }
 
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            tmapview.setCenterPoint(longitude, latitude);
+            String address = getAddress(getActivity(), latitude, longitude);
+            et_addr1.setText(address);
+            et_addr3.setText(address);
+            stopLocationService();
+        }
 
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+
+        public String getAddress(Context mContext, double lat, double lng) {
+            String nowAddress = "현재 위치를 확인 할 수 없습니다.";
+            Geocoder geocoder = new Geocoder(mContext, Locale.KOREA);
+            List<Address> address = null;
+
+            if (geocoder != null) {
+                //세번째 파라미터는 좌표에 대해 주소를 리턴 받는 갯수로
+                //한좌표에 대해 두개이상의 이름이 존재할수있기에 주소배열을 리턴받기 위해 최대갯수 설정
+                try {
+                    address = geocoder.getFromLocation(lat, lng, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (address != null && address.size() > 0) {
+                    // 주소 받아오기
+                    String currentLocationAddress = address.get(0).getAddressLine(0).toString();
+                    nowAddress = currentLocationAddress;
+                }
+            }
+
+            return nowAddress;
+        }
+    };
 }
